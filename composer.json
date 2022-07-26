@@ -1,0 +1,15 @@
+{
+  "name": "ebitkov/todoist-php-sdk",
+  "description": "Non-official PHP SDK of the Todoist REST API",
+  "authors": [
+    {
+      "name": "Emanuel Bitkov",
+      "email": "emanuel@bitkov.de"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "\\ebitkov\\TodoistSDK\\": "src/"
+    }
+  }
+}
