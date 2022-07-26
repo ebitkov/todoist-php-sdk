@@ -7,8 +7,11 @@ use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
+use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use PHPUnit\Util\Color;
 
 class Client extends \GuzzleHttp\Client
 {
@@ -22,7 +25,14 @@ class Client extends \GuzzleHttp\Client
     {
         $builder = SerializerBuilder::create();
 
-        $builder->configureListeners(function (EventDispatcher $dispatcher) {
+        $client = $this;
+        $builder->configureListeners(function (EventDispatcher $dispatcher) use ($client) {
+            $dispatcher->addListener('serializer.post_deserialize', function (ObjectEvent $event) use ($client) {
+                $object = $event->getObject();
+                if ($object instanceof ClientAware) {
+                    $object->setClient($client);
+                }
+            });
             $dispatcher->addSubscriber(new CollectionSubscriber());
         });
 
@@ -53,6 +63,32 @@ class Client extends \GuzzleHttp\Client
         ) {
             $content = $response->getBody()->getContents();
             return $this->serializer->deserialize($content, ProjectCollection::class, 'json');
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates a new project.
+     *
+     * @throws GuzzleException
+     */
+    public function createNewProject(Project $project): ?Project
+    {
+        $data = [
+            'name' => $project->getName(),
+            'parent_id' => $project->getParentId(),
+            'color' => $project->getColor(),
+            'is_favorite' => $project->getIsFavorite(),
+            'view_style' => $project->getViewStyle()
+        ];
+
+        $response = $this->post(Resource::PROJECTS, ['json' => $data]);
+        if ($response->getStatusCode() === 200) {
+            $project = $this->serializer->deserialize($response->getBody()->getContents(), Project::class, 'json');
+            $project->setClient($this);
+
+            return $project;
         }
 
         return null;

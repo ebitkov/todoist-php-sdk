@@ -2,10 +2,14 @@
 
 namespace ebitkov\TodoistSDK;
 
+use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
 
-class Project
+class Project implements ClientAware
 {
+    use ClientTrait;
+
+
     /**
      * @Serializer\Type("integer")
      */
@@ -19,52 +23,74 @@ class Project
     /**
      * @Serializer\Type("string")
      */
-    private ?string $color;
+    private ?string $color = null;
 
     /**
      * @Serializer\Type("integer")
      */
-    private ?int $parentId;
+    private ?int $parentId = null;
 
     /**
      * @Serializer\Type("integer")
      */
-    private ?int $order;
+    private ?int $order = null;
 
     /**
      * @Serializer\Type("integer")
      */
-    private ?int $commentCount;
+    private ?int $commentCount = null;
 
     /**
      * @Serializer\Type("boolean")
      */
-    private ?bool $isShared;
+    private ?bool $isShared = null;
 
     /**
      * @Serializer\Type("boolean")
      */
-    private ?bool $isFavorite;
+    private ?bool $isFavorite = null;
 
     /**
      * @Serializer\Type("boolean")
      */
-    private ?bool $isInboxProject;
+    private ?bool $isInboxProject = null;
 
     /**
      * @Serializer\Type("boolean")
      */
-    private ?bool $isTeamInbox;
+    private ?bool $isTeamInbox = null;
 
     /**
      * @Serializer\Type("string")
      */
-    private ?string $viewStyle;
+    private ?string $viewStyle = null;
 
     /**
      * @Serializer\Type("string")
      */
-    private ?string $url;
+    private ?string $url = null;
+
+
+    /**
+     * Creates a new project with the available parameters.
+     */
+    public static function new(string $name, string $colorName = null, bool $isFavorite = null, string $viewStyle = null): Project
+    {
+        return (new self())
+            ->setName($name)
+            ->setColor($colorName)
+            ->setIsFavorite($isFavorite)
+            ->setViewStyle($viewStyle);
+    }
+
+    /**
+     * Creates a new subproject.
+     * @throws GuzzleException
+     */
+    public function createNewProject(Project $project): ?Project
+    {
+        return $this->client->createNewProject($project->setParentId($this->getId()));
+    }
 
 
     public function getId(): ?int
@@ -90,7 +116,7 @@ class Project
 
     public function setColor(?string $color): self
     {
-        $this->color = $color;
+        if ($color && Colors::isValid($color)) $this->color = $color;
         return $this;
     }
 

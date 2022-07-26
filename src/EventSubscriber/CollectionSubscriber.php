@@ -16,7 +16,8 @@ class CollectionSubscriber implements EventSubscriberInterface
         return [
             [
                 'event' => 'serializer.post_deserialize',
-                'method' => 'onPostDeserialize'
+                'method' => 'onPostDeserialize',
+                'priority' => -1
             ]
         ];
     }
