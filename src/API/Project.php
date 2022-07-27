@@ -86,22 +86,9 @@ class Project implements ClientAware
             ->setViewStyle($viewStyle);
     }
 
-    /**
-     * Posts changes to the API.
-     */
     public function update(): bool
     {
-        $response = $this->client->post(
-            sprintf('%s/%d', Resource::PROJECTS, $this->getId()), [
-            'json' => [
-                'name' => $this->getName(),
-                'color' => $this->getColor(),
-                'is_favorite' => $this->getIsFavorite(),
-                'view_style' => $this->getViewStyle()
-            ]
-        ]);
-
-        return $response->getStatusCode() === 204;
+        return $this->client->updateProject($this);
     }
 
     /**

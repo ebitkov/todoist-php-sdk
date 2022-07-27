@@ -7,6 +7,7 @@ use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
+use InvalidArgumentException;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Serializer;
@@ -104,5 +105,27 @@ class Client extends \GuzzleHttp\Client
         }
 
         return null;
+    }
+
+    /**
+     * Posts changes to the API.
+     */
+    public function updateProject(Project $project): bool
+    {
+        if (null !== $project->getId()) {
+            $response = $this->post(
+                sprintf('%s/%d', Resource::PROJECTS, $project->getId()), [
+                'json' => [
+                    'name' => $project->getName(),
+                    'color' => $project->getColor(),
+                    'is_favorite' => $project->getIsFavorite(),
+                    'view_style' => $project->getViewStyle()
+                ]
+            ]);
+
+            return $response->getStatusCode() === 204;
+        } else {
+            throw new InvalidArgumentException('%s is not a valid project - ID is missing.', $project->getName());
+        }
     }
 }
