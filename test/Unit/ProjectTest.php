@@ -2,7 +2,6 @@
 
 namespace ebitkov\TodoistSDK\Test\Unit;
 
-use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\Test\ClientTestCase;
 
 class ProjectTest extends ClientTestCase
