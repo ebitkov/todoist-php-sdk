@@ -47,4 +47,9 @@ class ClientTest extends ClientTestCase
         // delete project
         self::assertTrue($project->delete());
     }
+
+    public function testGetAllCollaborators()
+    {
+        $this->markTestIncomplete(); # todo
+    }
 }

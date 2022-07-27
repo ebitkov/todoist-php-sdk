@@ -4,6 +4,7 @@ namespace ebitkov\TodoistSDK;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use ebitkov\TodoistSDK\API\Project;
+use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
@@ -140,5 +141,28 @@ class Client extends \GuzzleHttp\Client
     {
         $response = $this->delete(sprintf('%s/%d', Resource::PROJECTS, $projectId));
         return $response->getStatusCode() === 204;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getAllCollaborators(int $projectId): ?CollaboratorCollection
+    {
+        $response = $this->get(
+            sprintf('%s/%d/%s',
+                Resource::PROJECTS,
+                $projectId,
+                Resource::COLLABORATORS)
+        );
+
+        if ($response->getStatusCode() === 200) {
+            return $this->serializer->deserialize(
+                $response->getBody()->getContents(),
+                CollaboratorCollection::class,
+                'json'
+            );
+        }
+
+        return null;
     }
 }
