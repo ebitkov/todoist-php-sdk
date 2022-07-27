@@ -109,6 +109,8 @@ class Client extends \GuzzleHttp\Client
 
     /**
      * Posts changes to the API.
+     *
+     * @throws GuzzleException
      */
     public function updateProject(Project $project): bool
     {
@@ -127,5 +129,16 @@ class Client extends \GuzzleHttp\Client
         } else {
             throw new InvalidArgumentException('%s is not a valid project - ID is missing.', $project->getName());
         }
+    }
+
+    /**
+     * Deletes a project.
+     *
+     * @throws GuzzleException
+     */
+    public function deleteProject(int $projectId): bool
+    {
+        $response = $this->delete(sprintf('%s/%d', Resource::PROJECTS, $projectId));
+        return $response->getStatusCode() === 204;
     }
 }

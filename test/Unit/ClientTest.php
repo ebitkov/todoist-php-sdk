@@ -43,5 +43,8 @@ class ClientTest extends ClientTestCase
 
         self::assertInstanceOf(Project::class, $project);
         self::assertSame($id, $project->getId());
+
+        // delete project
+        self::assertTrue($project->delete());
     }
 }

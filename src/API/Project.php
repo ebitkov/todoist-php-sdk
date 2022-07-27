@@ -86,9 +86,20 @@ class Project implements ClientAware
             ->setViewStyle($viewStyle);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function update(): bool
     {
         return $this->client->updateProject($this);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function delete(): bool
+    {
+        return $this->client->deleteProject($this->getId());
     }
 
     /**
