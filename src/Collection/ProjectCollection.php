@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 class ProjectCollection extends ArrayCollection implements SerializedCollection
 {
     /**
-     * @Serializer\Type("array<ebitkov\TodoistSDK\Project>")
+     * @Serializer\Type("array<ebitkov\TodoistSDK\API\Project>")
      * @Serializer\Inline()
      */
     private array $projects;

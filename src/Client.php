@@ -3,15 +3,14 @@
 namespace ebitkov\TodoistSDK;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
-use PHPUnit\Util\Color;
 
 class Client extends \GuzzleHttp\Client
 {
@@ -84,6 +83,19 @@ class Client extends \GuzzleHttp\Client
         ];
 
         $response = $this->post(Resource::PROJECTS, ['json' => $data]);
+        if ($response->getStatusCode() === 200) {
+            $project = $this->serializer->deserialize($response->getBody()->getContents(), Project::class, 'json');
+            $project->setClient($this);
+
+            return $project;
+        }
+
+        return null;
+    }
+
+    public function getProject(int $projectId): ?Project
+    {
+        $response = $this->get(sprintf('%s/%d', Resource::PROJECTS, $projectId));
         if ($response->getStatusCode() === 200) {
             $project = $this->serializer->deserialize($response->getBody()->getContents(), Project::class, 'json');
             $project->setClient($this);

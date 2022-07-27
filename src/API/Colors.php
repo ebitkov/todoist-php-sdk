@@ -1,6 +1,6 @@
 <?php
 
-namespace ebitkov\TodoistSDK;
+namespace ebitkov\TodoistSDK\API;
 
 class Colors
 {

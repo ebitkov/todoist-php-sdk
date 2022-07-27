@@ -2,10 +2,9 @@
 
 namespace ebitkov\TodoistSDK\Test\Unit;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\Client;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
-use ebitkov\TodoistSDK\Project;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
@@ -22,8 +21,9 @@ class ClientTest extends TestCase
         }
     }
 
-    public function testGetAllProjects()
+    public function testGetAllProjectsAndGetProject()
     {
+        // get all projects
         $projects = $this->client->getAllProjects();
 
         self::assertInstanceOf(ProjectCollection::class, $projects);
@@ -31,6 +31,10 @@ class ClientTest extends TestCase
         self::assertNotEmpty($projects);
 
         foreach ($projects as $project) {
+            self::assertInstanceOf(Project::class, $project);
+
+            // get project
+            $project = $this->client->getProject($project->getId());
             self::assertInstanceOf(Project::class, $project);
         }
     }

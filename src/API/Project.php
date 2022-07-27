@@ -1,7 +1,9 @@
 <?php
 
-namespace ebitkov\TodoistSDK;
+namespace ebitkov\TodoistSDK\API;
 
+use ebitkov\TodoistSDK\ClientAware;
+use ebitkov\TodoistSDK\ClientTrait;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
 
