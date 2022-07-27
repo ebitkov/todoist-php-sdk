@@ -2,9 +2,10 @@
 
 namespace ebitkov\TodoistSDK\Test\Unit;
 
-use PHPUnit\Framework\TestCase;
+use ebitkov\TodoistSDK\API\Project;
+use ebitkov\TodoistSDK\Test\ClientTestCase;
 
-class ProjectTest extends TestCase
+class ProjectTest extends ClientTestCase
 {
     public function testNew()
     {

@@ -4,6 +4,7 @@ namespace ebitkov\TodoistSDK\API;
 
 use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
+use ebitkov\TodoistSDK\Resource;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -83,6 +84,24 @@ class Project implements ClientAware
             ->setColor($colorName)
             ->setIsFavorite($isFavorite)
             ->setViewStyle($viewStyle);
+    }
+
+    /**
+     * Posts changes to the API.
+     */
+    public function update(): bool
+    {
+        $response = $this->client->post(
+            sprintf('%s/%d', Resource::PROJECTS, $this->getId()), [
+            'json' => [
+                'name' => $this->getName(),
+                'color' => $this->getColor(),
+                'is_favorite' => $this->getIsFavorite(),
+                'view_style' => $this->getViewStyle()
+            ]
+        ]);
+
+        return $response->getStatusCode() === 204;
     }
 
     /**

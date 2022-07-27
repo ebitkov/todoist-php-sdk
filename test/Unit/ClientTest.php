@@ -3,28 +3,17 @@
 namespace ebitkov\TodoistSDK\Test\Unit;
 
 use ebitkov\TodoistSDK\API\Project;
-use ebitkov\TodoistSDK\Client;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
-use PHPUnit\Framework\TestCase;
+use ebitkov\TodoistSDK\Test\ClientTestCase;
 
-class ClientTest extends TestCase
+class ClientTest extends ClientTestCase
 {
-
-    private $client;
-
-    protected function setUp(): void
-    {
-        if (!empty($token = getenv('TODOIST_API_TOKEN'))) {
-            $this->client = new Client($token);
-        } else {
-            $this->markTestSkipped('Please provide an API token via the environment variable TODOIST_API_TOKEN to execute this test.');
-        }
-    }
-
     public function testGetAllProjectsAndGetProject()
     {
+        $client = self::getClient();
+
         // get all projects
-        $projects = $this->client->getAllProjects();
+        $projects = $client->getAllProjects();
 
         self::assertInstanceOf(ProjectCollection::class, $projects);
         self::assertIsIterable($projects);
@@ -34,15 +23,25 @@ class ClientTest extends TestCase
             self::assertInstanceOf(Project::class, $project);
 
             // get project
-            $project = $this->client->getProject($project->getId());
+            $project = $client->getProject($project->getId());
             self::assertInstanceOf(Project::class, $project);
         }
     }
 
-    public function testCreateProject()
+    public function testCreateGetDeleteProject()
     {
-        $project = $this->client->createNewProject(Project::new('Test-Project'));
+        $client = self::getClient();
+
+        // create project
+        $project = $client->createNewProject(Project::new('Test-Project'));
 
         self::assertInstanceOf(Project::class, $project);
+
+        // get project
+        $id = $project->getId();
+        $project = $client->getProject($id);
+
+        self::assertInstanceOf(Project::class, $project);
+        self::assertSame($id, $project->getId());
     }
 }
