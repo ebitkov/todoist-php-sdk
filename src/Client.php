@@ -4,6 +4,7 @@ namespace ebitkov\TodoistSDK;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use ebitkov\TodoistSDK\API\Project;
+use ebitkov\TodoistSDK\API\Section;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\Collection\SectionCollection;
@@ -185,6 +186,24 @@ class Client extends \GuzzleHttp\Client
                 SectionCollection::class,
                 'json'
             );
+        }
+
+        return null;
+    }
+
+    public function createNewSection(Section $section): ?Section
+    {
+        $data = [
+            'project_id' => $section->getProjectId(),
+            'name' => $section->getName(),
+        ];
+
+        $response = $this->post(Resource::SECTIONS, ['json' => $data]);
+        if ($response->getStatusCode() === 200) {
+            $section = $this->serializer->deserialize($response->getBody()->getContents(), Section::class, 'json');
+            $section->setClient($this);
+
+            return $section;
         }
 
         return null;

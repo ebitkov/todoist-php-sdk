@@ -15,6 +15,11 @@ class Section
     private int $id;
 
     /**
+     * @Serializer\Type("string")
+     */
+    private string $name;
+
+    /**
      * @Serializer\Type("integer")
      * @Serializer\SerializedName("project_id")
      */
@@ -25,13 +30,15 @@ class Section
     /**
      * @Serializer\Type("integer")
      */
-    private int $order;
+    private ?int $order;
 
-    /**
-     * @Serializer\Type("string")
-     */
-    private string $name;
 
+    public static function new(int $projectId, string $name): Section
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setName($name);
+    }
 
     public function getId(): int
     {
@@ -66,7 +73,7 @@ class Section
         return $this;
     }
 
-    public function getOrder(): int
+    public function getOrder(): ?int
     {
         return $this->order;
     }

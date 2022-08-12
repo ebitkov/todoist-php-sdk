@@ -117,6 +117,11 @@ class Project implements ClientAware
         return $this->client->getAllSections($this->getId());
     }
 
+    public function createNewSection(string $name): ?Section
+    {
+        return $this->client->createNewSection(Section::new($this->getId(), $name));
+    }
+
     /**
      * Creates a new subproject.
      * @throws GuzzleException
