@@ -5,6 +5,7 @@ namespace ebitkov\TodoistSDK;
 use Doctrine\Common\Collections\ArrayCollection;
 use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\API\Section;
+use ebitkov\TodoistSDK\API\Task;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\Collection\SectionCollection;
@@ -269,5 +270,26 @@ class Client
     public function getActiveTasks(array $parameters = []): ?TaskCollection
     {
         return $this->getAll(Resource::TASKS(), TaskCollection::class, $parameters);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function createNewTask(Task $task)
+    {
+        $data = [
+            'content' => $task->getContent(),
+            'description' => $task->getDescription(),
+            'project_id' => $task->getProjectId(),
+            'section_id' => $task->getSectionId(),
+            'parent_id' => $task->getParentId(),
+            'order' => $task->getOrder(),
+            'labels' => $task->getLabels(),
+            'priority' => $task->getPriority(),
+            # todo: due
+            'assignee_id' => $task->getAssigneeId(),
+        ];
+
+        return $this->createNew(Resource::TASKS(), Task::class, $data);
     }
 }
