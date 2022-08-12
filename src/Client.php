@@ -16,12 +16,14 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 
-class Client extends \GuzzleHttp\Client
+class Client
 {
     const API_URL = 'https://api.todoist.com/rest/v2/';
 
 
     private Serializer $serializer;
+
+    private \GuzzleHttp\Client $guzzle;
 
 
     public function __construct(string $token, array $guzzleConfig = [])
@@ -46,7 +48,81 @@ class Client extends \GuzzleHttp\Client
         $config['base_uri'] = self::API_URL;
         $config['headers']['Authorization'] = sprintf('Bearer %s', $token);
 
-        parent::__construct($config);
+        $this->guzzle = new \GuzzleHttp\Client($config);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    private function getAll(string $resource, string $type, array $options = [])
+    {
+        if (
+            ($response = $this->guzzle->get($resource, $options))
+            && $response->getStatusCode() === 200
+        ) {
+            $content = $response->getBody()->getContents();
+            return $this->serializer->deserialize($content, $type, 'json');
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    private function get(string $resource, string $type)
+    {
+        $response = $this->guzzle->get($resource);
+        if ($response->getStatusCode() === 200) {
+            $item = $this->serializer->deserialize($response->getBody()->getContents(), $type, 'json');
+            if ($item instanceof ClientAware) {
+                $item->setClient($this);
+            }
+
+            return $item;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    private function createNew(string $resource, string $type, array $data)
+    {
+        $response = $this->guzzle->post($resource, ['json' => $data]);
+        if ($response->getStatusCode() === 200) {
+            $project = $this->serializer->deserialize($response->getBody()->getContents(), $type, 'json');
+            $project->setClient($this);
+
+            return $project;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    private function update(string $resource, array $data): bool
+    {
+        $response = $this->guzzle->post(
+            $resource,
+            [
+                'json' => $data
+            ]
+        );
+
+        return $response->getStatusCode() === 204;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    private function delete(string $resource): bool
+    {
+        $response = $this->guzzle->delete($resource);
+        return $response->getStatusCode() === 204;
     }
 
     /**
@@ -60,15 +136,7 @@ class Client extends \GuzzleHttp\Client
      */
     public function getAllProjects(): ?ProjectCollection
     {
-        if (
-            ($response = $this->get(Resource::PROJECTS))
-            && $response->getStatusCode() === 200
-        ) {
-            $content = $response->getBody()->getContents();
-            return $this->serializer->deserialize($content, ProjectCollection::class, 'json');
-        }
-
-        return null;
+        return $this->getAll(Resource::PROJECTS(), ProjectCollection::class);
     }
 
     /**
@@ -86,28 +154,15 @@ class Client extends \GuzzleHttp\Client
             'view_style' => $project->getViewStyle()
         ];
 
-        $response = $this->post(Resource::PROJECTS, ['json' => $data]);
-        if ($response->getStatusCode() === 200) {
-            $project = $this->serializer->deserialize($response->getBody()->getContents(), Project::class, 'json');
-            $project->setClient($this);
-
-            return $project;
-        }
-
-        return null;
+        return $this->createNew(Resource::PROJECTS(), Project::class, $data);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getProject(int $projectId): ?Project
     {
-        $response = $this->get(sprintf('%s/%d', Resource::PROJECTS, $projectId));
-        if ($response->getStatusCode() === 200) {
-            $project = $this->serializer->deserialize($response->getBody()->getContents(), Project::class, 'json');
-            $project->setClient($this);
-
-            return $project;
-        }
-
-        return null;
+        return $this->get(Resource::PROJECTS($projectId), Project::class);
     }
 
     /**
@@ -118,19 +173,17 @@ class Client extends \GuzzleHttp\Client
     public function updateProject(Project $project): bool
     {
         if (null !== $project->getId()) {
-            $response = $this->post(
-                sprintf('%s/%d', Resource::PROJECTS, $project->getId()), [
-                'json' => [
-                    'name' => $project->getName(),
-                    'color' => $project->getColor(),
-                    'is_favorite' => $project->getIsFavorite(),
-                    'view_style' => $project->getViewStyle()
-                ]
+            return $this->update(Resource::PROJECTS($project->getId()), [
+                'name' => $project->getName(),
+                'color' => $project->getColor(),
+                'is_favorite' => $project->getIsFavorite(),
+                'view_style' => $project->getViewStyle()
             ]);
-
-            return $response->getStatusCode() === 204;
         } else {
-            throw new InvalidArgumentException('%s is not a valid project - ID is missing.', $project->getName());
+            throw new InvalidArgumentException(sprintf(
+                '%s is not a valid project - ID is missing.',
+                $project->getName()
+            ));
         }
     }
 
@@ -141,8 +194,7 @@ class Client extends \GuzzleHttp\Client
      */
     public function deleteProject(int $projectId): bool
     {
-        $response = $this->delete(sprintf('%s/%d', Resource::PROJECTS, $projectId));
-        return $response->getStatusCode() === 204;
+        return $this->delete(Resource::PROJECTS($projectId));
     }
 
     /**
@@ -150,22 +202,7 @@ class Client extends \GuzzleHttp\Client
      */
     public function getAllCollaborators(int $projectId): ?CollaboratorCollection
     {
-        $response = $this->get(
-            sprintf('%s/%d/%s',
-                Resource::PROJECTS,
-                $projectId,
-                Resource::COLLABORATORS)
-        );
-
-        if ($response->getStatusCode() === 200) {
-            return $this->serializer->deserialize(
-                $response->getBody()->getContents(),
-                CollaboratorCollection::class,
-                'json'
-            );
-        }
-
-        return null;
+        return $this->getAll(Resource::COLLABORATORS($projectId), CollaboratorCollection::class);
     }
 
     /**
@@ -173,22 +210,9 @@ class Client extends \GuzzleHttp\Client
      */
     public function getAllSections(int $projectId): ?SectionCollection
     {
-        $response = $this->get(
-            Resource::SECTIONS,
-            [
-                'project_id' => $projectId
-            ]
-        );
-
-        if ($response->getStatusCode() === 200) {
-            return $this->serializer->deserialize(
-                $response->getBody()->getContents(),
-                SectionCollection::class,
-                'json'
-            );
-        }
-
-        return null;
+        return $this->getAll(Resource::SECTIONS(), SectionCollection::class, [
+            'project_id' => $projectId
+        ]);
     }
 
     /**
@@ -201,15 +225,7 @@ class Client extends \GuzzleHttp\Client
             'name' => $section->getName(),
         ];
 
-        $response = $this->post(Resource::SECTIONS, ['json' => $data]);
-        if ($response->getStatusCode() === 200) {
-            $section = $this->serializer->deserialize($response->getBody()->getContents(), Section::class, 'json');
-            $section->setClient($this);
-
-            return $section;
-        }
-
-        return null;
+        return $this->createNew(Resource::SECTIONS(), Section::class, $data);
     }
 
     /**
@@ -217,14 +233,26 @@ class Client extends \GuzzleHttp\Client
      */
     public function getSection(int $sectionId): ?Section
     {
-        $response = $this->get(sprintf('%s/%d', Resource::PROJECTS, $sectionId));
-        if ($response->getStatusCode() === 200) {
-            $section = $this->serializer->deserialize($response->getBody()->getContents(), Section::class, 'json');
-            $section->setClient($this);
+        return $this->get(Resource::SECTIONS($sectionId), Section::class);
+    }
 
-            return $section;
+    /**
+     * Posts changes to the API.
+     *
+     * @throws GuzzleException
+     */
+    public function updateSection(Section $section): bool
+    {
+        if (null !== $section->getId()) {
+            return $this->update(Resource::SECTIONS($section->getId()), [
+                'name' => $section->getName()
+            ]);
+        } else {
+            throw new InvalidArgumentException(
+                sprintf('section %s in project %s is not valid - ID is missing.',
+                    $section->getName(),
+                    $section->getProject()->getName()
+                ));
         }
-
-        return null;
     }
 }

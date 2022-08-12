@@ -2,10 +2,12 @@
 
 namespace ebitkov\TodoistSDK\API;
 
+use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
+use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
 
-class Section
+class Section implements ClientAware
 {
     use ClientTrait;
 
@@ -56,6 +58,9 @@ class Section
         return $this;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getProject(): ?Project
     {
         if (null === $this->project) {
@@ -76,12 +81,6 @@ class Section
     public function getOrder(): ?int
     {
         return $this->order;
-    }
-
-    public function setOrder(int $order): self
-    {
-        $this->order = $order;
-        return $this;
     }
 
     public function getName(): string
