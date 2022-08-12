@@ -5,6 +5,7 @@ namespace ebitkov\TodoistSDK\API;
 use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
+use ebitkov\TodoistSDK\Collection\SectionCollection;
 use ebitkov\TodoistSDK\Resource;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
@@ -109,6 +110,11 @@ class Project implements ClientAware
     public function getCollaborators(): ?CollaboratorCollection
     {
         return $this->client->getAllCollaborators($this->getId());
+    }
+
+    public function getSections(): ?SectionCollection
+    {
+        return $this->client->getAllSections($this->getId());
     }
 
     /**
