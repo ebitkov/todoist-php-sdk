@@ -67,6 +67,15 @@ class Section implements ClientAware
         return $this->client->getActiveTasks(['section_id' => $this->getId()]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function createNewTask(Task $task): bool
+    {
+        $task->setSection($this);
+        return $this->client->createNewTask($task);
+    }
+
 
     public function getId(): int
     {

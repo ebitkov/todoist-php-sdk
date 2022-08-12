@@ -141,6 +141,15 @@ class Project implements ClientAware
     /**
      * @throws GuzzleException
      */
+    public function createNewTask(Task $task): bool
+    {
+        $task->setProject($this);
+        return $this->client->createNewTask($task);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function getCollaborators(): ?CollaboratorCollection
     {
         return $this->client->getAllCollaborators($this->getId());
