@@ -42,6 +42,14 @@ class Section implements ClientAware
             ->setName($name);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function update(): bool
+    {
+        return $this->client->updateSection($this);
+    }
+
     public function getId(): int
     {
         return $this->id;
