@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
+use ebitkov\TodoistSDK\Collection\SectionCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
@@ -159,6 +160,29 @@ class Client extends \GuzzleHttp\Client
             return $this->serializer->deserialize(
                 $response->getBody()->getContents(),
                 CollaboratorCollection::class,
+                'json'
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getAllSections(int $projectId): ?SectionCollection
+    {
+        $response = $this->get(
+            Resource::SECTIONS,
+            [
+                'project_id' => $projectId
+            ]
+        );
+
+        if ($response->getStatusCode() === 200) {
+            return $this->serializer->deserialize(
+                $response->getBody()->getContents(),
+                SectionCollection::class,
                 'json'
             );
         }

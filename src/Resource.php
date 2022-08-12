@@ -4,7 +4,7 @@ namespace ebitkov\TodoistSDK;
 
 interface Resource
 {
-    const PROJECTS = 'projects';
-
     const COLLABORATORS = 'collaborators';
+    const PROJECTS = 'projects';
+    const SECTIONS = 'sections';
 }
