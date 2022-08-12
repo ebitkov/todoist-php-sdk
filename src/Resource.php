@@ -26,4 +26,13 @@ class Resource
         }
         return $ep;
     }
+
+    public static function TASKS(?int $id = null): string
+    {
+        $ep = 'tasks';
+        if ($id !== null) {
+            $ep .= '/' . $id;
+        }
+        return $ep;
+    }
 }

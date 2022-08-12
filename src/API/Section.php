@@ -4,6 +4,7 @@ namespace ebitkov\TodoistSDK\API;
 
 use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
+use ebitkov\TodoistSDK\Collection\TaskCollection;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -57,6 +58,15 @@ class Section implements ClientAware
     {
         return $this->client->deleteSection($this->getId());
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getActiveTasks(): ?TaskCollection
+    {
+        return $this->client->getActiveTasks(['section_id' => $this->getId()]);
+    }
+
 
     public function getId(): int
     {

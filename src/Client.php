@@ -8,6 +8,7 @@ use ebitkov\TodoistSDK\API\Section;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\ProjectCollection;
 use ebitkov\TodoistSDK\Collection\SectionCollection;
+use ebitkov\TodoistSDK\Collection\TaskCollection;
 use ebitkov\TodoistSDK\EventSubscriber\CollectionSubscriber;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
@@ -260,5 +261,13 @@ class Client
     public function deleteSection(int $sectionId): bool
     {
         return $this->delete(Resource::SECTIONS($sectionId));
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getActiveTasks(array $parameters = []): ?TaskCollection
+    {
+        return $this->getAll(Resource::TASKS(), TaskCollection::class, $parameters);
     }
 }

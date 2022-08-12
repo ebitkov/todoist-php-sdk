@@ -6,6 +6,7 @@ use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
 use ebitkov\TodoistSDK\Collection\SectionCollection;
+use ebitkov\TodoistSDK\Collection\TaskCollection;
 use ebitkov\TodoistSDK\Resource;
 use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\Annotation as Serializer;
@@ -107,16 +108,22 @@ class Project implements ClientAware
     /**
      * @throws GuzzleException
      */
-    public function getCollaborators(): ?CollaboratorCollection
+    public function getActiveTasks(): ?TaskCollection
     {
-        return $this->client->getAllCollaborators($this->getId());
+        return $this->client->getActiveTasks(['project_id' => $this->getId()]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getSections(): ?SectionCollection
     {
         return $this->client->getAllSections($this->getId());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function createNewSection(string $name): ?Section
     {
         return $this->client->createNewSection(Section::new($this->getId(), $name));
@@ -129,6 +136,14 @@ class Project implements ClientAware
     public function createNewProject(Project $project): ?Project
     {
         return $this->client->createNewProject($project->setParentId($this->getId()));
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getCollaborators(): ?CollaboratorCollection
+    {
+        return $this->client->getAllCollaborators($this->getId());
     }
 
 
