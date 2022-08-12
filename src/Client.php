@@ -332,4 +332,12 @@ class Client
     {
         return 204 === $this->guzzle->post(Resource::TASKS($taskId) . '/close')->getStatusCode();
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function reopenTask(int $taskId): bool
+    {
+        return 204 === $this->guzzle->post(Resource::TASKS($taskId) . '/reopen')->getStatusCode();
+    }
 }
