@@ -191,6 +191,9 @@ class Client extends \GuzzleHttp\Client
         return null;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function createNewSection(Section $section): ?Section
     {
         $data = [
@@ -199,6 +202,22 @@ class Client extends \GuzzleHttp\Client
         ];
 
         $response = $this->post(Resource::SECTIONS, ['json' => $data]);
+        if ($response->getStatusCode() === 200) {
+            $section = $this->serializer->deserialize($response->getBody()->getContents(), Section::class, 'json');
+            $section->setClient($this);
+
+            return $section;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getSection(int $sectionId): ?Section
+    {
+        $response = $this->get(sprintf('%s/%d', Resource::PROJECTS, $sectionId));
         if ($response->getStatusCode() === 200) {
             $section = $this->serializer->deserialize($response->getBody()->getContents(), Section::class, 'json');
             $section->setClient($this);
