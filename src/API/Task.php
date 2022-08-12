@@ -122,6 +122,14 @@ class Task implements ClientAware
     /**
      * @throws GuzzleException
      */
+    public function close(): bool
+    {
+        return $this->client->closeTask($this->getId());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function createNewTask(Task $task): bool
     {
         $task->setParent($task);

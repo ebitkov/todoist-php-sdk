@@ -324,4 +324,12 @@ class Client
                 ));
         }
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function closeTask(int $taskId): bool
+    {
+        return 204 === $this->guzzle->post(Resource::TASKS($taskId) . '/close')->getStatusCode();
+    }
 }
