@@ -237,8 +237,6 @@ class Client
     }
 
     /**
-     * Posts changes to the API.
-     *
      * @throws GuzzleException
      */
     public function updateSection(Section $section): bool
@@ -254,5 +252,13 @@ class Client
                     $section->getProject()->getName()
                 ));
         }
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function deleteSection(int $sectionId): bool
+    {
+        return $this->delete(Resource::SECTIONS($sectionId));
     }
 }

@@ -50,6 +50,14 @@ class Section implements ClientAware
         return $this->client->updateSection($this);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function delete(): bool
+    {
+        return $this->client->deleteSection($this->getId());
+    }
+
     public function getId(): int
     {
         return $this->id;
