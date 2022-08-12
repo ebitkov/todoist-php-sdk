@@ -111,6 +111,14 @@ class Task implements ClientAware
     }
 
 
+    /**
+     * @throws GuzzleException
+     */
+    public function update(): bool
+    {
+        return $this->client->updateTask($this);
+    }
+
     public function setProject(?Project $project): self
     {
         $this->project = $project;

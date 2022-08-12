@@ -300,4 +300,28 @@ class Client
     {
         return $this->get(Resource::TASKS($taskId), Task::class);
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function updateTask(Task $task): bool
+    {
+        if (null !== $task->getId()) {
+            return $this->update(Resource::TASKS($task->getId()), [
+                'content' => $task->getContent(),
+                'description' => $task->getDescription(),
+                'labels' => $task->getLabels(),
+                'priority' => $task->getPriority(),
+                # todo: due
+                'assignee_id' => $task->getAssigneeId(),
+            ]);
+        } else {
+            throw new InvalidArgumentException(
+                sprintf('task %s (#%d) in project %s is not valid - ID is missing.',
+                    $task->getContent(),
+                    $task->getId(),
+                    $task->getProject()->getName()
+                ));
+        }
+    }
 }
