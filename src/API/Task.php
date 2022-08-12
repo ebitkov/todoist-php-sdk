@@ -151,9 +151,15 @@ class Task implements ClientAware
         return $this;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getParent(): ?Task
     {
-        # todo: load task if missing
+        if (null === $this->parent && $this->parentId) {
+            $this->parent = $this->client->getActiveTask($this->parentId);
+        }
+
         return $this->parent;
     }
 

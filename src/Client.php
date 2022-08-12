@@ -292,4 +292,12 @@ class Client
 
         return $this->createNew(Resource::TASKS(), Task::class, $data);
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getActiveTask(int $taskId): ?Task
+    {
+        return $this->get(Resource::TASKS($taskId), Task::class);
+    }
 }
