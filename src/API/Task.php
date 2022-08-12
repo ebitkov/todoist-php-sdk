@@ -138,6 +138,14 @@ class Task implements ClientAware
     /**
      * @throws GuzzleException
      */
+    public function delete(): bool
+    {
+        return $this->client->deleteTask($this->getId());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function createNewTask(Task $task): bool
     {
         $task->setParent($task);

@@ -340,4 +340,12 @@ class Client
     {
         return 204 === $this->guzzle->post(Resource::TASKS($taskId) . '/reopen')->getStatusCode();
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function deleteTask(int $taskId): bool
+    {
+        return $this->delete(Resource::TASKS($taskId));
+    }
 }
