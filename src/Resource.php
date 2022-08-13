@@ -35,4 +35,13 @@ class Resource
         }
         return $ep;
     }
+
+    public static function COMMENTS(?int $id = null): string
+    {
+        $ep = 'comments';
+        if ($id !== null) {
+            $ep .= '/' . $id;
+        }
+        return $ep;
+    }
 }

@@ -348,4 +348,12 @@ class Client
     {
         return $this->delete(Resource::TASKS($taskId));
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getAllComments(array $parameters = [])
+    {
+        return $this->getAll(Resource::TASKS(), TaskCollection::class, $parameters);
+    }
 }

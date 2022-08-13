@@ -4,6 +4,7 @@ namespace ebitkov\TodoistSDK\API;
 
 use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
+use ebitkov\TodoistSDK\Collection\CommentCollection;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use JMS\Serializer\Annotation as Serializer;
@@ -151,6 +152,15 @@ class Task implements ClientAware
         $task->setParent($task);
         return $this->client->createNewTask($task);
     }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getComments(): ?CommentCollection
+    {
+        return $this->client->getAllComments(['task_id' => $this->getId()]);
+    }
+
 
     public function setProject(?Project $project): self
     {

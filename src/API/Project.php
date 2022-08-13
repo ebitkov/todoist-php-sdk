@@ -5,6 +5,7 @@ namespace ebitkov\TodoistSDK\API;
 use ebitkov\TodoistSDK\ClientAware;
 use ebitkov\TodoistSDK\ClientTrait;
 use ebitkov\TodoistSDK\Collection\CollaboratorCollection;
+use ebitkov\TodoistSDK\Collection\CommentCollection;
 use ebitkov\TodoistSDK\Collection\SectionCollection;
 use ebitkov\TodoistSDK\Collection\TaskCollection;
 use ebitkov\TodoistSDK\Resource;
@@ -145,6 +146,14 @@ class Project implements ClientAware
     {
         $task->setProject($this);
         return $this->client->createNewTask($task);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getComments(): ?CommentCollection
+    {
+        return $this->client->getAllComments(['project_id' => $this->getId()]);
     }
 
     /**
