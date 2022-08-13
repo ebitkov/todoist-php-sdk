@@ -3,6 +3,7 @@
 namespace ebitkov\TodoistSDK;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use ebitkov\TodoistSDK\API\Comment;
 use ebitkov\TodoistSDK\API\Project;
 use ebitkov\TodoistSDK\API\Section;
 use ebitkov\TodoistSDK\API\Task;
@@ -355,5 +356,27 @@ class Client
     public function getAllComments(array $parameters = [])
     {
         return $this->getAll(Resource::TASKS(), TaskCollection::class, $parameters);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function createNewComment(Comment $comment): ?Comment
+    {
+        $data = [
+            'content' => $comment->getContent(),
+        ];
+
+        if ($comment->getAttachment()) {
+            $data['attachment'] = $this->serializer->serialize($comment->getAttachment(), 'json');
+        }
+
+        if ($comment->getProjectId()) {
+            $data['project_id'] = $comment->getProjectId();
+        } else if ($comment->getTaskId()) {
+            $data['task_id'] = $comment->getTaskId();
+        }
+
+        return $this->createNew(Resource::COMMENTS(), Comment::class, $data);
     }
 }

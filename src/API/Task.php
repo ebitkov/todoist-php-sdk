@@ -161,6 +161,15 @@ class Task implements ClientAware
         return $this->client->getAllComments(['task_id' => $this->getId()]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function createNewComment(Comment $comment): ?Comment
+    {
+        $comment->setTaskId($this->getId());
+        return $this->client->createNewComment($comment);
+    }
+
 
     public function setProject(?Project $project): self
     {

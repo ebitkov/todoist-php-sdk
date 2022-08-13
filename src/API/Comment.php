@@ -48,6 +48,14 @@ class Comment implements ClientAware
     private ?Attachment $attachment;
 
 
+    public static function new(string $content, Attachment $attachment = null): Comment
+    {
+        return (new self())
+            ->setContent($content)
+            ->setAttachment($attachment);
+    }
+
+
     public function getId(): int
     {
         return $this->id;
@@ -58,6 +66,12 @@ class Comment implements ClientAware
         return $this->content;
     }
 
+    public function setContent(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
     public function getPostedAt(): DateTime
     {
         return $this->postedAt;
@@ -66,6 +80,12 @@ class Comment implements ClientAware
     public function getProjectId(): ?int
     {
         return $this->projectId;
+    }
+
+    public function setProjectId(?int $projectId): self
+    {
+        $this->projectId = $projectId;
+        return $this;
     }
 
     /**
@@ -85,6 +105,12 @@ class Comment implements ClientAware
         return $this->taskId;
     }
 
+    public function setTaskId(?int $taskId): self
+    {
+        $this->taskId = $taskId;
+        return $this;
+    }
+
     /**
      * @throws GuzzleException
      */
@@ -100,5 +126,11 @@ class Comment implements ClientAware
     public function getAttachment(): ?Attachment
     {
         return $this->attachment;
+    }
+
+    public function setAttachment(?Attachment $attachment): self
+    {
+        $this->attachment = $attachment;
+        return $this;
     }
 }

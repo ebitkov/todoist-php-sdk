@@ -159,6 +159,15 @@ class Project implements ClientAware
     /**
      * @throws GuzzleException
      */
+    public function createNewComment(Comment $comment): ?Comment
+    {
+        $comment->setProjectId($this->getId());
+        return $this->client->createNewComment($comment);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function getCollaborators(): ?CollaboratorCollection
     {
         return $this->client->getAllCollaborators($this->getId());
